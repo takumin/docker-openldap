@@ -1,0 +1,52 @@
+version: '3.7'
+
+services:
+  #
+  # build
+  #
+  openldap-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    image: takumi/openldap:build
+    hostname: openldap-build
+    container_name: openldap-build
+    command: /bin/true
+    networks:
+      - openldap
+
+  #
+  # service
+  #
+  openldap:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    image: takumi/openldap:latest
+    hostname: openldap
+    container_name: openldap
+    restart: always
+    networks:
+      - openldap
+    ports:
+      - 389:389
+      - 636:636
+    volumes:
+      - openldap-config:/etc/openldap
+      - openldap-data:/var/lib/openldap
+    environment:
+      - "OPENLDAP_UID=${OPENLDAP_UID:-1000}"
+      - "OPENLDAP_GID=${OPENLDAP_GID:-1000}"
+      - "OPENLDAP_DEBUG=${OPENLDAP_DEBUG:-0}"
+      - "OPENLDAP_CONFIG_ROOTDN=${OPENLDAP_CONFIG_ROOTDN:-cn=admin,cn=config}"
+      - "OPENLDAP_CONFIG_ROOTPW=${OPENLDAP_CONFIG_ROOTPW:-config}"
+
+networks:
+  openldap:
+volumes:
+  openldap-config:
+    name: openldap-config
+  openldap-data:
+    name: openldap-data

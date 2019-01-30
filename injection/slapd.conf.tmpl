@@ -1,0 +1,14 @@
+{{- $OPENLDAP_CONFIG_ROOTDN := default .Env.OPENLDAP_CONFIG_ROOTDN "cn=admin,cn=config" -}}
+{{- $OPENLDAP_CONFIG_ROOTPW := default .Env.OPENLDAP_CONFIG_ROOTPW "config" -}}
+#
+# Common
+#
+pidfile  /run/openldap/slapd.pid
+argsfile /run/openldap/slapd.args
+
+#
+# Config Backend
+#
+database config
+rootdn   "{{ $OPENLDAP_CONFIG_ROOTDN }}"
+rootpw   {{ $OPENLDAP_CONFIG_ROOTPW }}

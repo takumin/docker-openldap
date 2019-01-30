@@ -1,0 +1,7 @@
+**/.git/
+config/
+.env
+.envrc
+Dockerfile
+Makefile
+docker-compose.yml
