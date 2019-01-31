@@ -166,7 +166,7 @@ if [ "$1" = 'openldap' ]; then
 	su-exec openldap:openldap slaptest -v -d "${OPENLDAP_DEBUG}" -u -f "${OPENLDAP_SLAPD_CONF}" -F /var/lib/openldap/slapd.d
 
 	if [ -f "/etc/openldap/slapd.ldif" ]; then
-		su-exec openldap:openldap slapadd -v -d "${OPENLDAP_DEBUG}" -u -f "${OPENLDAP_SLAPD_CONF}" -F /var/lib/openldap/slapd.d -l /etc/openldap/slapd.ldif
+		su-exec openldap:openldap slapadd -v -d "${OPENLDAP_DEBUG}" -u -f "${OPENLDAP_SLAPD_CONF}" -F /var/lib/openldap/slapd.d -n 0 -l /etc/openldap/slapd.ldif
 	fi
 
 	##############################################################################
