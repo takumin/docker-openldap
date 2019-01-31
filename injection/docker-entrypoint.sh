@@ -109,20 +109,20 @@ if [ "$1" = 'openldap' ]; then
 	# Initialize
 	##############################################################################
 
-	if [ ! -d "/etc/openldap/schema" ]; then
-		cp -r "/usr/share/openldap/schema" "/etc/openldap/schema"
+	if [ ! -d "/etc/openldap" ]; then
+		mkdir -p "/etc/openldap"
 	fi
 
-	if [ ! -d "/etc/openldap/slapd.d" ]; then
-		mkdir -p "/etc/openldap/slapd.d"
+	if [ ! -d "/etc/openldap/schema" ]; then
+		cp -r "/usr/share/openldap/schema" "/etc/openldap/schema"
 	fi
 
 	if [ ! -d "/run/openldap" ]; then
 		mkdir -p "/run/openldap"
 	fi
 
-	if [ ! -d "/var/lib/openldap" ]; then
-		mkdir -p "/var/lib/openldap"
+	if [ ! -d "/var/lib/openldap/slapd.d" ]; then
+		mkdir -p "/var/lib/openldap/slapd.d"
 	fi
 
 	##############################################################################
@@ -149,7 +149,7 @@ if [ "$1" = 'openldap' ]; then
 	# Check
 	##############################################################################
 
-	su-exec openldap:openldap slaptest -v -d "${OPENLDAP_DEBUG}" -u -f /run/openldap/slapd.conf -F /etc/openldap/slapd.d
+	su-exec openldap:openldap slaptest -v -d "${OPENLDAP_DEBUG}" -u -f /run/openldap/slapd.conf -F /var/lib/openldap/slapd.d
 
 	##############################################################################
 	# Daemon
@@ -158,7 +158,7 @@ if [ "$1" = 'openldap' ]; then
 	SERV_OPTS=""
 	SERV_OPTS="${SERV_OPTS} -d ${OPENLDAP_DEBUG}"
 	SERV_OPTS="${SERV_OPTS} -f /run/openldap/slapd.conf"
-	SERV_OPTS="${SERV_OPTS} -F /etc/openldap/slapd.d"
+	SERV_OPTS="${SERV_OPTS} -F /var/lib/openldap/slapd.d"
 	SERV_OPTS="${SERV_OPTS} -u ${OPENLDAP_UID}"
 	SERV_OPTS="${SERV_OPTS} -g ${OPENLDAP_GID}"
 
