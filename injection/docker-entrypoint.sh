@@ -133,23 +133,30 @@ if [ "$1" = 'openldap' ]; then
 	# Config
 	##############################################################################
 
-	cat > /run/openldap/slapd.conf <<- __EOF__
-	pidfile  /run/openldap/slapd.pid
-	argsfile /run/openldap/slapd.args
-	database config
-	rootdn   "${OPENLDAP_CONFIG_DN}"
-	rootpw   ${OPENLDAP_CONFIG_PW}
-	__EOF__
+	if [ -f /etc/openldap/slapd.conf.tmpl ]; then
+		dockerize -template /etc/openldap/slapd.conf.tmpl:/run/openldap/slapd.conf
+	elif [ -f /etc/openldap/slapd.conf ]; then
+		cp /etc/openldap/slapd.conf /run/openldap/slapd.conf
+	else
+		cat > /run/openldap/slapd.conf <<- __EOF__
+		pidfile  /run/openldap/slapd.pid
+		argsfile /run/openldap/slapd.args
+		database config
+		rootdn   "${OPENLDAP_CONFIG_DN}"
+		rootpw   ${OPENLDAP_CONFIG_PW}
+		__EOF__
+	fi
 
 	slaptest -v -d "${OPENLDAP_DEBUG}" -f /run/openldap/slapd.conf -F /var/lib/openldap/slapd.d
 
-	if [ -f "/etc/openldap/slapd.conf.tmpl" ]; then
-		dockerize -template /etc/openldap/slapd.conf.tmpl:/run/openldap/slapd.user.conf
-		slaptest -v -d "${OPENLDAP_DEBUG}" -f /run/openldap/slapd.user.conf -F /var/lib/openldap/slapd.d
+	if [ -f /etc/openldap/slapd.ldif.tmpl ]; then
+		dockerize -template /etc/openldap/slapd.ldif.tmpl:/run/openldap/slapd.ldif
+	elif [ -f /etc/openldap/slapd.ldif ]; then
+		cp /etc/openldap/slapd.ldif /run/openldap/slapd.ldif
 	fi
 
-	if [ -f "/etc/openldap/slapd.ldif" ]; then
-		slapadd -v -d "${OPENLDAP_DEBUG}" -F /var/lib/openldap/slapd.d -n 0 -l /etc/openldap/slapd.ldif
+	if [ -f /run/openldap/slapd.ldif ]; then
+		slapadd -v -d "${OPENLDAP_DEBUG}" -F /var/lib/openldap/slapd.d -n 0 -l /run/openldap/slapd.ldif
 	fi
 
 	##############################################################################
