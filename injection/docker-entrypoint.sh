@@ -131,6 +131,10 @@ if [ "$1" = 'openldap' ]; then
 		mkdir -p "/run/openldap"
 	fi
 
+	if [ ! -d "/var/lib/openldap" ]; then
+		mkdir -p "/var/lib/openldap"
+	fi
+
 	if [ ! -d "/var/lib/openldap/slapd.d" ]; then
 		mkdir -p "/var/lib/openldap/slapd.d"
 	fi
@@ -151,6 +155,12 @@ if [ "$1" = 'openldap' ]; then
 		__EOF__
 	fi
 
+	slaptest -v -d "${OPENLDAP_DEBUG}" -f "${OPENLDAP_SLAPD_CONF}" -F /var/lib/openldap/slapd.d
+
+	if [ -f "/etc/openldap/slapd.ldif" ]; then
+		slapadd -v -d "${OPENLDAP_DEBUG}" -f "${OPENLDAP_SLAPD_CONF}" -F /var/lib/openldap/slapd.d -n 0 -l /etc/openldap/slapd.ldif
+	fi
+
 	##############################################################################
 	# Permission
 	##############################################################################
@@ -160,22 +170,11 @@ if [ "$1" = 'openldap' ]; then
 	chown -R openldap:openldap /var/lib/openldap
 
 	##############################################################################
-	# Check
-	##############################################################################
-
-	su-exec openldap:openldap slaptest -v -d "${OPENLDAP_DEBUG}" -u -f "${OPENLDAP_SLAPD_CONF}" -F /var/lib/openldap/slapd.d
-
-	if [ -f "/etc/openldap/slapd.ldif" ]; then
-		su-exec openldap:openldap slapadd -v -d "${OPENLDAP_DEBUG}" -u -f "${OPENLDAP_SLAPD_CONF}" -F /var/lib/openldap/slapd.d -n 0 -l /etc/openldap/slapd.ldif
-	fi
-
-	##############################################################################
 	# Daemon
 	##############################################################################
 
 	SERV_OPTS=""
 	SERV_OPTS="${SERV_OPTS} -d ${OPENLDAP_DEBUG}"
-	SERV_OPTS="${SERV_OPTS} -f ${OPENLDAP_SLAPD_CONF}"
 	SERV_OPTS="${SERV_OPTS} -F /var/lib/openldap/slapd.d"
 	SERV_OPTS="${SERV_OPTS} -u ${OPENLDAP_UID}"
 	SERV_OPTS="${SERV_OPTS} -g ${OPENLDAP_GID}"
