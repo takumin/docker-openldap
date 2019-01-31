@@ -40,8 +40,8 @@ services:
       - "OPENLDAP_UID=${OPENLDAP_UID:-1000}"
       - "OPENLDAP_GID=${OPENLDAP_GID:-1000}"
       - "OPENLDAP_DEBUG=${OPENLDAP_DEBUG:-0}"
-      - "OPENLDAP_CONFIG_ROOTDN=${OPENLDAP_CONFIG_ROOTDN:-cn=admin,cn=config}"
-      - "OPENLDAP_CONFIG_ROOTPW=${OPENLDAP_CONFIG_ROOTPW:-config}"
+      - "OPENLDAP_CONFIG_DN=${OPENLDAP_CONFIG_DN:-cn=admin,cn=config}"
+      - "OPENLDAP_CONFIG_PW=${OPENLDAP_CONFIG_PW:-admin}"
 
 networks:
   openldap:

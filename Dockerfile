@@ -19,10 +19,6 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
     && tar -C /usr/local/bin -xzvf dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-alpine-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
-# Copy Config File
-RUN mkdir -p /usr/local/etc
-COPY ./injection/slapd.conf.tmpl /usr/local/etc/slapd.conf.tmpl
-
 # Copy Entrypoint Script
 COPY ./injection/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod 0755 /usr/local/bin/docker-entrypoint.sh
@@ -38,6 +34,7 @@ COPY --from=build /usr/local /usr/local
 
 RUN echo "Deploy Config Starting" \
  && apk --no-cache --update add \
+    su-exec \
     runit \
     openldap \
     openldap-backend-all \
