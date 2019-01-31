@@ -125,6 +125,14 @@ if [ "$1" = 'openldap' ]; then
 		mkdir -p "/var/lib/openldap"
 	fi
 
+	if [ ! -d "/var/lib/openldap/cache" ]; then
+		mkdir -p "/var/lib/openldap/cache"
+	fi
+
+	if [ ! -d "/var/lib/openldap/data" ]; then
+		mkdir -p "/var/lib/openldap/data"
+	fi
+
 	if [ ! -d "/var/lib/openldap/slapd.d" ]; then
 		mkdir -p "/var/lib/openldap/slapd.d"
 	fi
@@ -147,21 +155,25 @@ if [ "$1" = 'openldap' ]; then
 		__EOF__
 	fi
 
-	slaptest -v -d "${OPENLDAP_DEBUG}" -f /run/openldap/slapd.conf -F /var/lib/openldap/slapd.d
+	# slapindex -v -d "${OPENLDAP_DEBUG}" -f /run/openldap/slapd.conf -F /var/lib/openldap/slapd.d -u
+	# slaptest -v -d "${OPENLDAP_DEBUG}" -f /run/openldap/slapd.conf -F /var/lib/openldap/slapd.d -u
 
-	if [ -f /etc/openldap/slapd.ldif.tmpl ]; then
-		dockerize -template /etc/openldap/slapd.ldif.tmpl:/run/openldap/slapd.ldif
-	elif [ -f /etc/openldap/slapd.ldif ]; then
-		cp /etc/openldap/slapd.ldif /run/openldap/slapd.ldif
-	fi
+	# if [ -f /etc/openldap/slapd.ldif.tmpl ]; then
+	# 	dockerize -template /etc/openldap/slapd.ldif.tmpl:/run/openldap/slapd.ldif
+	# elif [ -f /etc/openldap/slapd.ldif ]; then
+	# 	cp /etc/openldap/slapd.ldif /run/openldap/slapd.ldif
+	# fi
 
-	if [ -f /run/openldap/slapd.ldif ]; then
-		slapadd -v -d "${OPENLDAP_DEBUG}" -F /var/lib/openldap/slapd.d -n 0 -l /run/openldap/slapd.ldif
-	fi
+	# if [ -f /run/openldap/slapd.ldif ]; then
+	# 	slapadd -v -d "${OPENLDAP_DEBUG}" -F /var/lib/openldap/slapd.d -n 0 -l /run/openldap/slapd.ldif
+	# fi
 
 	##############################################################################
 	# Permission
 	##############################################################################
+
+	chmod 0700 /var/lib/openldap/cache
+	chmod 0700 /var/lib/openldap/data
 
 	chown -R openldap:openldap /etc/openldap
 	chown -R openldap:openldap /run/openldap
@@ -173,6 +185,7 @@ if [ "$1" = 'openldap' ]; then
 
 	SERV_OPTS=""
 	SERV_OPTS="${SERV_OPTS} -d ${OPENLDAP_DEBUG}"
+	SERV_OPTS="${SERV_OPTS} -f /run/openldap/slapd.conf"
 	SERV_OPTS="${SERV_OPTS} -F /var/lib/openldap/slapd.d"
 	SERV_OPTS="${SERV_OPTS} -u ${OPENLDAP_UID}"
 	SERV_OPTS="${SERV_OPTS} -g ${OPENLDAP_GID}"
