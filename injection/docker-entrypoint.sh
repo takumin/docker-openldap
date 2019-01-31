@@ -27,6 +27,16 @@ if [ "$1" = 'openldap' ]; then
 	fi
 
 	##############################################################################
+	# Environment
+	##############################################################################
+
+	if [ -f "/etc/openldap/slapd.conf" ]; then
+		OPENLDAP_SLAPD_CONF="/etc/openldap/slapd.conf"
+	else
+		OPENLDAP_SLAPD_CONF="/run/openldap/slapd.conf"
+	fi
+
+	##############################################################################
 	# Check
 	##############################################################################
 
@@ -129,13 +139,17 @@ if [ "$1" = 'openldap' ]; then
 	# Config
 	##############################################################################
 
-	cat > "/run/openldap/slapd.conf" <<- __EOF__
-	pidfile  /run/openldap/slapd.pid
-	argsfile /run/openldap/slapd.args
-	database config
-	rootdn   "${OPENLDAP_CONFIG_DN}"
-	rootpw   ${OPENLDAP_CONFIG_PW}
-	__EOF__
+	if [ -f "/etc/openldap/slapd.conf.tmpl" ]; then
+		dockerize -template /etc/openldap/slapd.conf.tmpl:/run/openldap/slapd.conf
+	else
+		cat > "/run/openldap/slapd.conf" <<- __EOF__
+		pidfile  /run/openldap/slapd.pid
+		argsfile /run/openldap/slapd.args
+		database config
+		rootdn   "${OPENLDAP_CONFIG_DN}"
+		rootpw   ${OPENLDAP_CONFIG_PW}
+		__EOF__
+	fi
 
 	##############################################################################
 	# Permission
@@ -149,7 +163,7 @@ if [ "$1" = 'openldap' ]; then
 	# Check
 	##############################################################################
 
-	su-exec openldap:openldap slaptest -v -d "${OPENLDAP_DEBUG}" -u -f /run/openldap/slapd.conf -F /var/lib/openldap/slapd.d
+	su-exec openldap:openldap slaptest -v -d "${OPENLDAP_DEBUG}" -u -f ${OPENLDAP_SLAPD_CONF} -F /var/lib/openldap/slapd.d
 
 	##############################################################################
 	# Daemon
@@ -157,7 +171,7 @@ if [ "$1" = 'openldap' ]; then
 
 	SERV_OPTS=""
 	SERV_OPTS="${SERV_OPTS} -d ${OPENLDAP_DEBUG}"
-	SERV_OPTS="${SERV_OPTS} -f /run/openldap/slapd.conf"
+	SERV_OPTS="${SERV_OPTS} -f ${OPENLDAP_SLAPD_CONF}"
 	SERV_OPTS="${SERV_OPTS} -F /var/lib/openldap/slapd.d"
 	SERV_OPTS="${SERV_OPTS} -u ${OPENLDAP_UID}"
 	SERV_OPTS="${SERV_OPTS} -g ${OPENLDAP_GID}"
