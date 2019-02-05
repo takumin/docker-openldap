@@ -161,11 +161,9 @@ if [ "$1" = 'openldap' ]; then
 		cp /etc/openldap/slapd.ldif /run/openldap/slapd.ldif
 	fi
 
-	# slaptest -v -d "${OPENLDAP_DEBUG}" -f /run/openldap/slapd.conf -F /var/lib/openldap/slapd.d
-
-	ls -la /var/lib/openldap/slapd.d
-
-	if [ -f /run/openldap/slapd.ldif ]; then
+	if [ ! -f /run/openldap/slapd.ldif ]; then
+		slaptest -v -d "${OPENLDAP_DEBUG}" -f /run/openldap/slapd.conf -F /var/lib/openldap/slapd.d
+	else
 		slapadd -v -d "${OPENLDAP_DEBUG}" -F /var/lib/openldap/slapd.d -n 0 -l /run/openldap/slapd.ldif
 	fi
 
@@ -186,7 +184,6 @@ if [ "$1" = 'openldap' ]; then
 
 	SERV_OPTS=""
 	SERV_OPTS="${SERV_OPTS} -d ${OPENLDAP_DEBUG}"
-	# SERV_OPTS="${SERV_OPTS} -f /run/openldap/slapd.conf"
 	SERV_OPTS="${SERV_OPTS} -F /var/lib/openldap/slapd.d"
 	SERV_OPTS="${SERV_OPTS} -u ${OPENLDAP_UID}"
 	SERV_OPTS="${SERV_OPTS} -g ${OPENLDAP_GID}"
