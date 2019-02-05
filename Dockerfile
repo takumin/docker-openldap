@@ -38,6 +38,7 @@ RUN echo "Deploy Config Starting" \
     openldap \
     openldap-backend-all \
     openldap-overlay-all \
+    openldap-clients \
  && mkdir -p /usr/share/openldap \
  && mv /etc/openldap/schema /usr/share/openldap/schema \
  && rm -fr /etc/openldap \
