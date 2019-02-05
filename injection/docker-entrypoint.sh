@@ -155,18 +155,15 @@ if [ "$1" = 'openldap' ]; then
 		__EOF__
 	fi
 
-	# slapindex -v -d "${OPENLDAP_DEBUG}" -f /run/openldap/slapd.conf -F /var/lib/openldap/slapd.d -u
-	# slaptest -v -d "${OPENLDAP_DEBUG}" -f /run/openldap/slapd.conf -F /var/lib/openldap/slapd.d -u
+	if [ -f /etc/openldap/slapd.ldif.tmpl ]; then
+		dockerize -template /etc/openldap/slapd.ldif.tmpl:/run/openldap/slapd.ldif
+	elif [ -f /etc/openldap/slapd.ldif ]; then
+		cp /etc/openldap/slapd.ldif /run/openldap/slapd.ldif
+	fi
 
-	# if [ -f /etc/openldap/slapd.ldif.tmpl ]; then
-	# 	dockerize -template /etc/openldap/slapd.ldif.tmpl:/run/openldap/slapd.ldif
-	# elif [ -f /etc/openldap/slapd.ldif ]; then
-	# 	cp /etc/openldap/slapd.ldif /run/openldap/slapd.ldif
-	# fi
-
-	# if [ -f /run/openldap/slapd.ldif ]; then
-	# 	slapadd -v -d "${OPENLDAP_DEBUG}" -F /var/lib/openldap/slapd.d -n 0 -l /run/openldap/slapd.ldif
-	# fi
+	if [ -f /run/openldap/slapd.ldif ]; then
+		slapadd -v -Y EXTERNAL -H ldapi:// -f /run/openldap/slapd.ldif
+	fi
 
 	##############################################################################
 	# Permission
