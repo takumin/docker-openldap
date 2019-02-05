@@ -34,7 +34,7 @@ services:
       - 389:389
       - 636:636
     volumes:
-      - openldap-config:/etc/openldap
+      - ./config:/etc/openldap
       - openldap-data:/var/lib/openldap
     environment:
       - "OPENLDAP_UID=${OPENLDAP_UID:-1000}"
@@ -46,7 +46,5 @@ services:
 networks:
   openldap:
 volumes:
-  openldap-config:
-    name: openldap-config
   openldap-data:
     name: openldap-data
