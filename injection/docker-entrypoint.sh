@@ -162,7 +162,7 @@ if [ "$1" = 'openldap' ]; then
 	fi
 
 	if [ ! -f /run/openldap/slapd.ldif ]; then
-		slaptest -v -d "${OPENLDAP_DEBUG}" -f /run/openldap/slapd.conf -F /var/lib/openldap/slapd.d
+		slaptest -v -d "${OPENLDAP_DEBUG}" -f /run/openldap/slapd.conf -n 0 -F /var/lib/openldap/slapd.d
 	else
 		slapadd -v -d "${OPENLDAP_DEBUG}" -F /var/lib/openldap/slapd.d -n 0 -l /run/openldap/slapd.ldif
 	fi
